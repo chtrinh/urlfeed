@@ -1,17 +1,18 @@
   var http = require('http')
   ,   url = require('url')
   ,   fs = require('fs');
-
+var homeview = fs.readFileSync('./index.html');
 var router = function(req,res){
 
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.end('Hello World\n');
+  res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8; '});
+  res.end(homeview);
 
 };
 var renderErPage = function(req,res){
   res.writeHead(400);
   res.end('fuck you no path');
 };
+
 
 
 http.createServer(function (req, res) {
