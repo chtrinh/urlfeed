@@ -16,12 +16,12 @@ var renderErPage = function(req,res){
 
 
 http.createServer(function (req, res) {
-  var newProc = new RegExp('^/?$');
+  var newProc = new RegExp('^/(|process)$');
   var pathname = url.parse(req.url).pathname;
   if(newProc.test(pathname)){
     router(req,res);
   }else{
-  renderErPage(req,res);
+    renderErPage(req,res);
   }
   router(req,res);
 }).listen(5000, '127.0.0.1');
