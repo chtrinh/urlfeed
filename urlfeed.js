@@ -1,28 +1,27 @@
-UrlFeed = {
-  outputDiv: 0,  
-  response: 0,
-  init: function(){
-    UrlFeed.outputDiv = $('#output'); 
-  },
-  process: function(url){
+var http = require('http'),
+    url = require('url') 
+  ;
 
-    var request = $.ajax({url:'http://google.com',dataType: 'jsonp', success: UrlFeed.processResult, crossDomain: true});
-    request.done(function(msg) {
-      console.log(msg);
+exports.request = function(_url, _request){
+  var pageUrl = url.parse(_url);
+
+  http.get({host: pageUrl.host, port: pageUrl.port || 80, path: pageUrl.path, agent:false}, function(res) {
+    console.log("Got response: " + res.statusCode);
+    var data = '';
+
+    res.addListener('data', function(chunk){ 
+        data += chunk; 
     });
-
-    request.fail(function(jqXHR, textStatus) {
-      console.log( "Request failed: " + textStatus );
-      console.log(jqXHR);
-      UrlFeed.response = jqXHR;
+    res.addListener('end', function(){
+          console.log("Body: " + data);
+          _request.writeHead(200, {'Content-Type': 'text/html; charset=utf-8; '});
+          _request.end(data);    
     });
-  },
-  processResult: function(data){
-    console.log("Result");
-    console.log(UrlFeed.outputDiv);
-    UrlFeed.outputDiv.html(data);
-  }
+  }).on('error', function(e) {
+      console.log("Got error: " + e.message);
+  });
+  console.log("hm");
 
+  return "ok";
 }
 
-$(UrlFeed.init);
