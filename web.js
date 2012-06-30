@@ -3,22 +3,25 @@
       fs = require('fs'),
       urlfeed = require('./urlfeed.js');
 
-var router = function(req, res, path){
-//http://owely.com/4cb8465e29603
+var router = function(request, response, path){
+
   var result = "";
+  var url_parts = url.parse(request.url, true);
+  
   switch(path){
     case("/process"):
-      result = urlfeed.request('http://owely.com/4cb8465e29603', res);
+      urlfeed.process(url_parts.query["url"], response);
       break;
-    default:
+    case("/"):
       result = fs.readFileSync('./index.html');
-      res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8; '});
-      res.end(result);
-
+      response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8; '});
+      response.end(result);
+      break;
   }
 
  
 };
+
 
 var renderErPage = function(req,res){
   res.writeHead(400);
