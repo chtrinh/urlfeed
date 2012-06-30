@@ -53,7 +53,7 @@ exports.process = function(_url, _response){
     texts = sortLongest(texts);
     response['texts'] = texts;
     
-    _response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8;'});
+    _response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8;', 'Access-Control-Allow-Origin' :'*'});
     _response.end(JSON.stringify(response));
 
   }
