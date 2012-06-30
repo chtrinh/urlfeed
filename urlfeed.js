@@ -29,21 +29,24 @@ exports.process = function(_url, _response){
   function onParseEnd(err, window){
     var $ = window.jQuery;
     var response = { };
-    response['images']=[];
-    
+
     //collect images
+    var images = [];
+    var images_src = [];
     $('img').each(function(index, value){
       var image = $(value);
-      var item = {image:{}};
       var width = parseDimention(image.attr('width'));
       var height = parseDimention(image.attr('height'));
-      item['image']['src'] = image.attr('src');
-      item['image']['width'] = width;
-      item['image']['height'] = height;
-      if(width> 50 && height > 50){//ignore small images
-        response['images'].push(item);
+      var src = image.attr('src');
+      src = src.indexOf('http') == 0 ? src : pageUrl.protocol + '//' + pageUrl.host + src;
+
+      if( (images_src.indexOf(src) == -1) && //check for duplicates 
+      ((width> 50 && height > 50) || (width == 0 && height == 0) )){//ignore small images
+        images.push({'src': src, 'width': width, 'height': height});
+        images_src.push( src );
       }
     });
+    response['images'] = images;
 
     //collect text
     texts = extractText($, $('html'));
