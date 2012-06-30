@@ -39,7 +39,7 @@ http.createServer(function (req, res) {
     renderErPage(req,res);
   }
   router(req,res);
-}).listen(5000, '127.0.0.1');
+}).listen(process.env.PORT || 5000, '127.0.0.1');
 
 
 console.log('running at http://127.0.0.1:5000/');
