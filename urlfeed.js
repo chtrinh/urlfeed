@@ -3,6 +3,7 @@ var http = require('http'),
     jsdom = require('jsdom')
   ;
 
+//process function logic goes here
 exports.process = function(_url, _response){
   var pageUrl = url.parse(_url);
 
@@ -14,21 +15,36 @@ exports.process = function(_url, _response){
         data += chunk; 
     });
     res.addListener('end', function(){
-        jsdom.env({
-          html: data,
-          scripts: [
-            'http://code.jquery.com/jquery-1.5.min.js'
-          ]
-        }, onParseEnd);
+      //check content-type
+      var contentType = res.headers['content-type'];
+
+      if(contentType.indexOf('image') == 0){ //then it's  an image doah!
+        writeResponse(_response, {images:[{src:_url, width:0, height:0}], texts:[]});
+      }else 
+      if( contentType.indexOf('text/html') == 0 ){
+        processHtml(data);       
+      }else{
+        writeResponse(_response, {images:[], texts:[]});
+      }
     });
   }).on('error', function(e) {
       console.log("Got error: " + e.message);
   });
 
+  function processHtml(data){
+          jsdom.env({
+            html: data,
+            scripts: [
+              './jquery.min.js'
+            ]
+          }, onParseEnd);
+
+  }
+
 
   function onParseEnd(err, window){
     var $ = window.jQuery;
-    var response = { };
+    var responseData = { };
 
     //collect images
     var images = [];
@@ -46,17 +62,22 @@ exports.process = function(_url, _response){
         images_src.push( src );
       }
     });
-    response['images'] = images;
+    responseData['images'] = images;
 
     //collect text
     texts = extractText($, $('html'));
     texts = sortLongest(texts);
-    response['texts'] = texts;
-    
-    _response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8;', 'Access-Control-Allow-Origin' :'*'});
-    _response.end(JSON.stringify(response));
+    responseData['texts'] = texts;
 
+    writeResponse(_response, responseData)
   }
+}
+
+//helper functions
+
+function writeResponse(response, data){
+    response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8;', 'Access-Control-Allow-Origin' :'*'});
+    response.end(JSON.stringify(data));
 }
 
 function parseDimention(value){
