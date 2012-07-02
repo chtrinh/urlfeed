@@ -35,7 +35,7 @@ exports.process = function(_url, _response){
           jsdom.env({
             html: data,
             scripts: [
-              './jquery.min.js'
+              './helpers/jquery.min.js'
             ]
           }, onParseEnd);
 
